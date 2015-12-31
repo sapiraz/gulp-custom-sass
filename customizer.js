@@ -1,4 +1,7 @@
-var gulp      = require('gulp');
+//var gulp      = require('gulp');
+
+var exports = module.exports = function(gulp){
+
 var postcss   = require('gulp-postcss');
 var nested    = require('postcss-nested');
 var scss      = require('postcss-scss');
@@ -100,11 +103,16 @@ gulp.task('applyCustomizations',['recordCustomizations'],function(){
 
 });
 
-gulp.task('default',['applyCustomizations'], function() {
+gulp.task('customizerMain',['applyCustomizations'], function() {
 
   return gulp.src("./"+tempDir+"/*.scss")
-  .pipe(exec('sass templib/style.scss:www/css/style.css',function(){
+  .pipe(exec('sass templib/style.scss:www/css/style.css',function(err){
+    if(err){
+      throw err;
+    }
     del([tempDir]);
   }));
 
 });
+
+}
