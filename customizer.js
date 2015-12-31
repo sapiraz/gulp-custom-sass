@@ -1,7 +1,8 @@
 //var gulp      = require('gulp');
 
-var exports = module.exports = function(gulp){
+var exports = module.exports = function(gulp,options){
 
+options = !options ? {} : options;
 var postcss   = require('gulp-postcss');
 var nested    = require('postcss-nested');
 var scss      = require('postcss-scss');
@@ -10,39 +11,36 @@ var gcallback = require('gulp-callback');
 var sass      = require('gulp-sass');
 var baseDir   = process.cwd();
 var tempDir   = "templib";
-var targetDir = "www/css/";
+var copyDir   = options.copyDir ? options.copyDir : "library";      // What directory to copy to the temp dir.
+var customDir = options.customDir ? options.customDir : "custom";   // Directory that contains the customizations
+var customDirTarget = options.customDirTarget ? options.customDirTarget : "library";   // Directory to which we'll apply the customizations
+var targetDir = options.targetDir ? options.targetDir : "www/css"; // final output folder
+var mainCss   = options.mainCss ? options.mainCss : 'style';        // The file we'll ask SASS to compile
 var del       = require('del');
 var exec      = require('gulp-exec');
-
-var opacity = function (css, opts) {
-  console.log(css.nodes[1].selector);
-    css.eachDecl(function(decl) {
-        if (decl.prop === 'opacity') {
-            decl.parent.insertAfter(decl, {
-                prop: '-ms-filter',
-                value: '"progid:DXImageTransform.Microsoft.Alpha(Opacity=' + (parseFloat(decl.value) * 100) + ')"'
-            });
-        }
-    });
-};
 
 var rules = [];
 
 var ruleRecorder = function (css, opts) {
+
   console.log("RuleRecorder");
-  var fileRules = {file:css.source.input.file.replace(baseDir,"").replace("custom",tempDir),rules:[]};
+  var fileRules = {file:css.source.input.file.replace(baseDir,"").replace(customDir,customDirTarget).replace(copyDir,tempDir),rules:[]};
   for(var i in css.nodes){
     fileRules.rules.push(css.nodes[i]);
   }
   rules.push(fileRules);
   console.log("Recorded "+ fileRules.rules.length +" rules from file: " + css.source.input.file);
+  console.log(fileRules.file.replace(baseDir,""));
+
 };
 
 
 var ruleReplacer = function (css, opts) {
+  //console.log("Checking file:" + css.source.input.file);
   ///Make sure there were some rules recorded from the same file in the custom folder
   var file = null;
   for(var f in rules){
+    //console.log("Comparing:" + rules[f].file + " WITH " + css.source.input.file.replace(baseDir,""));
     if(rules[f].file === css.source.input.file.replace(baseDir,"")){
       file = rules[f];
       break;
@@ -72,6 +70,8 @@ var ruleReplacer = function (css, opts) {
       }
     }
 
+  } else {
+
   }
 };
 
@@ -79,7 +79,7 @@ var ruleReplacer = function (css, opts) {
 gulp.task('copyFiles',function(){
   console.log("Copying files");
   ///Copy all files to a temp folder
-  return gulp.src(['./library/**/*'])
+  return gulp.src(['./'+copyDir+'/**/*'])
   .pipe(gulp.dest(tempDir));
 });
 
@@ -87,7 +87,7 @@ gulp.task('copyFiles',function(){
 gulp.task('recordCustomizations',['copyFiles'],function(){
   console.log("Recording Customizations");
   ///read our customizations and add them to an object
-  return gulp.src('./custom/**/*.scss')
+  return gulp.src('./'+copyDir+'/'+customDir+'/**/*.scss')
       .pipe(postcss([ruleRecorder],{syntax: scss}))
       .pipe(gcallback(function() {
         console.log("Done Recording Customizations.");
@@ -97,22 +97,19 @@ gulp.task('recordCustomizations',['copyFiles'],function(){
 gulp.task('applyCustomizations',['recordCustomizations'],function(){
 
   console.log("Applying customizations...");
-  return gulp.src('./'+tempDir+'/**/*.scss')
+  return gulp.src('./'+tempDir+'/'+customDirTarget+'/**/*.scss')
   .pipe(postcss([ruleReplacer],{syntax: scss}))
-  .pipe(gulp.dest(tempDir));
+  .pipe(gulp.dest('./'+tempDir+'/'+customDirTarget));
 
 });
 
 gulp.task('customizerMain',['applyCustomizations'], function() {
-
   return gulp.src("./"+tempDir+"/*.scss")
-  .pipe(exec('sass templib/style.scss:www/css/style.css',function(err){
+  .pipe(exec('sass templib/'+mainCss+'.scss:'+targetDir+'/'+mainCss+'.css',function(err){
     if(err){
       throw err;
     }
     del([tempDir]);
   }));
-
 });
-
 }
