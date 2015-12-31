@@ -1,0 +1,14 @@
+{
+  "name":"gulp-custom-sass",
+  "version":"0.0.1",
+  "description": "A Gulp task for customizing SCSS frameworks without touching their source & keeping your build clean",
+  "author": "Raz Sapir <sapiraz@gmail.com>",
+  "dependencies": {
+    "gulp-postcss": "6.0.1",
+    "postcss-nested": "1.0.0",
+    "postcss-scss": "0.1.3",
+    "gulp-callback": "0.0.3",
+    "gulp-sass": "2.1.1"
+  },
+  "engine": "node >= 0.10.35"
+}
