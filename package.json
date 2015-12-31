@@ -1,6 +1,6 @@
 {
   "name":"gulp-custom-sass",
-  "version":"0.0.1",
+  "version":"0.0.2",
   "description": "A Gulp task for customizing SCSS frameworks without touching their source & keeping your build clean",
   "author": "Raz Sapir <sapiraz@gmail.com>",
   "dependencies": {

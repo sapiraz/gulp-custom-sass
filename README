@@ -1,0 +1,33 @@
+# gulp-custom-sass
+
+This is a simple Gulp task that allows you to customize SCSS frameworks without touching their source files.
+
+I just didn't want to touch the source so that I could always install / update them without worrying that my work will be overridden.
+
+Obviously you need Gulp.
+
+## Install
+```bash
+npm install gulp-custom-sass
+```
+
+## Basic Usage
+
+```js
+var gulp = require('gulp');
+var options = {
+
+copyDir:"scss",
+customDir:"custombootstrap",
+customDirTarget:"bootstrap",
+targetDir:"www/style",
+mainCss:"main"
+
+}
+
+var customizer = require('gulp-custom-sass')(gulp,options);
+
+gulp.task('default',['customizerMain'],function(){
+
+});
+```
