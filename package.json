@@ -1,8 +1,14 @@
 {
   "name":"gulp-custom-sass",
   "version":"0.0.3",
-  "description": "A Gulp task for customizing SCSS frameworks without touching their source & keeping your build clean",
+  "description": "A Gulp task for customizing SCSS frameworks such as Bootstrap without touching their source",
   "author": "Raz Sapir <sapiraz@gmail.com>",
+  "homepage": "https://github.com/sapiraz/gulp-custom-sass",
+  "keywords": [
+    "gulp",
+    "bootstrap",
+    "scss"
+  ],
   "dependencies": {
     "gulp-postcss": "6.0.1",
     "postcss-nested": "1.0.0",
